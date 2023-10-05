@@ -12,7 +12,7 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from_stream(stream: &mut TcpStream) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from_tcp_stream(stream: &mut TcpStream) -> Result<Self, Box<dyn std::error::Error>> {
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(stream);
         let mut request_line: String = String::new();
 

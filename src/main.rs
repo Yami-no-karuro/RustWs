@@ -36,12 +36,15 @@ fn main() {
 }
 
 fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
-    let request: Request = Request::from_stream(&mut stream)?;
+    let request: Request = Request::from_tcp_stream(&mut stream)?;
 
-    let mut response: Response = Response::new("HTTP/1.1 200 OK", "text/plain");
+    let mut response: Response = Response::new();
+    response.set_status("HTTP/1.1 200 OK");
+    response.set_content_type("text/plain");
     response.set_content(&format!("{:#?}", request));
-    response.set_header("x-powered-by", "rustws");
-    response.set_header("x-software-version", "v1.0");
+
+    response.set_header("X-Powered-By", "RustWS");
+    response.set_header("X-Server-Version", "v1.0");
 
     let response = response.prepare();
     stream.write_all(response.as_bytes())?;

@@ -8,14 +8,27 @@ pub struct Response<'a> {
 }
 
 impl<'a> Response<'a> {
-    pub fn new(status: &'a str, content_type: &'a str) -> Self {
+    pub fn new() -> Self {
         Response {
-            status,
-            content_type,
+            status: "",
+            content_type: "",
             content: String::new(),
             content_length: 0,
             headers: Vec::new(),
         }
+    }
+
+    pub fn set_status(&mut self, status: &'a str) {
+        self.status = status;
+    }
+
+    pub fn set_content_type(&mut self, content_type: &'a str) {
+        self.content_type = content_type;
+    }
+
+    pub fn set_content(&mut self, content: &str) {
+        self.content = content.to_string();
+        self.content_length = self.content.len();
     }
 
     pub fn prepare(&self) -> String {
@@ -27,11 +40,6 @@ impl<'a> Response<'a> {
             "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n{}\r\n{}",
             self.status, self.content_type, self.content_length, headers_str, self.content
         );
-    }
-
-    pub fn set_content(&mut self, content: &str) {
-        self.content = content.to_string();
-        self.content_length = self.content.len();
     }
 
     pub fn set_header(&mut self, key: &str, value: &str) {
