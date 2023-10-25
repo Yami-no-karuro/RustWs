@@ -27,7 +27,7 @@ fn main() {
             process::exit(1);
         });
 
-    println!("Catcher ready at port {}", config.port);
+    println!("Request Catcher ready at port {}", config.port);
     println!("Listening...");
 
     for stream in listener.incoming() {
