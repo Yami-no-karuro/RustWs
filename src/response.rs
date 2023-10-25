@@ -10,8 +10,8 @@ pub struct Response<'a> {
 impl<'a> Response<'a> {
     pub fn new() -> Self {
         Response {
-            status: "",
-            content_type: "",
+            status: "HTTP/1.1 200 OK",
+            content_type: "text/plain",
             content: String::new(),
             content_length: 0,
             headers: Vec::new(),
@@ -31,6 +31,10 @@ impl<'a> Response<'a> {
         self.content_length = self.content.len();
     }
 
+    pub fn set_header(&mut self, key: &str, value: &str) {
+        self.headers.push((key.to_string(), value.to_string()));
+    }
+
     pub fn prepare(&self) -> String {
         let mut headers_str: String = String::new();
         for (key, value) in &self.headers {
@@ -40,9 +44,5 @@ impl<'a> Response<'a> {
             "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n{}\r\n{}",
             self.status, self.content_type, self.content_length, headers_str, self.content
         );
-    }
-
-    pub fn set_header(&mut self, key: &str, value: &str) {
-        self.headers.push((key.to_string(), value.to_string()));
     }
 }

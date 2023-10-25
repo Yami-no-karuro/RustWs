@@ -15,23 +15,29 @@ use std::process;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let config: Config = Config::create_from_args(&args).unwrap_or_else(|err| {
-        println!("Unable to load configuration, error: {}", err);
+        eprintln!("Unable to load configuration, error: {}", err);
+        println!("Exiting..");
         process::exit(1);
     });
 
     let listener: TcpListener = TcpListener::bind(format!("127.0.0.1:{}", config.port))
         .unwrap_or_else(|err: std::io::Error| {
-            println!("Unable to bind on port: {}, error: {}", config.port, err);
+            eprintln!("Unable to bind on port: {}, error: {}", config.port, err);
+            println!("Exiting..");
             process::exit(1);
         });
+
+    println!("Catcher ready at port {}", config.port);
+    println!("Listening...");
 
     for stream in listener.incoming() {
         let stream: TcpStream = stream.unwrap();
         if let Err(error) = handle_connection(stream) {
-            println!("Unable to handle connection, error: {}", error);
+            eprintln!("Unable to handle connection, error: {}", error);
         }
     }
 
+    println!("Exiting..");
     process::exit(0);
 }
 
