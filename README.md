@@ -1,2 +1,2 @@
-# RustWS
+# RustWs
 ## A simple Rust Webserver.

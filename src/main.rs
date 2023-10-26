@@ -46,9 +46,9 @@ fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Er
     println!("{:#?}", request);
 
     let mut response: Response = Response::new();
-    response.set_status("HTTP/1.1 200 OK");
-    response.set_content_type("text/plain");
-    response.set_content("Hello, World!");
+    response.set_status(Response::HTTP_OK);
+    response.set_content_type(Response::CONTENT_TYPE_TEXT_PLAIN);
+    response.set_content("Hello! \nWelcome to RustWs!");
 
     response.set_header("X-Powered-By", "RustWS");
     response.set_header("X-Server-Version", "v1.0");
