@@ -10,8 +10,8 @@ pub struct Response<'a> {
 impl<'a> Response<'a> {
     pub fn new() -> Self {
         Response {
-            status: "HTTP/1.1 200 OK",
-            content_type: "text/plain",
+            status: "",
+            content_type: "",
             content: String::new(),
             content_length: 0,
             headers: Vec::new(),

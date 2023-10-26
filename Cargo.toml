@@ -1,5 +1,5 @@
 [package]
-name = "request-catcher"
+name = "rust-ws"
 version = "0.1.0"
 edition = "2021"
 
