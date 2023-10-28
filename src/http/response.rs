@@ -119,6 +119,10 @@ impl<'a> Response<'a> {
         self.content_length = self.content.len();
     }
 
+    pub fn set_content_lenght(&mut self, content_length: usize) {
+        self.content_length = content_length;
+    }
+
     pub fn set_header(&mut self, key: &str, value: &str) {
         self.headers.push((key.to_string(), value.to_string()));
     }

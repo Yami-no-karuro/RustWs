@@ -1,11 +1,9 @@
 mod config;
 use config::Config;
 
-mod request;
-use request::Request;
-
-mod response;
-use response::Response;
+mod http;
+use http::request::Request;
+use http::response::Response;
 
 use std::env;
 use std::io::prelude::*;
