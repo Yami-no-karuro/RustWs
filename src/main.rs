@@ -1,16 +1,17 @@
 mod config;
 use config::Config;
 
+mod router;
+use router::Router;
+
 mod http;
 use http::request::Request;
 use http::response::Response;
 use http::response_type::ContentType;
 use http::status_code::StatusCode;
 
-mod router;
-use router::Router;
-
 use std::env;
+use std::fs::File;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::process;
@@ -31,7 +32,6 @@ fn main() {
             process::exit(1);
         });
 
-    println!("Registering routes...");
     let mut router: Router = Router::new();
     register_routes(&mut router);
 
@@ -52,13 +52,31 @@ fn main() {
 
 fn register_routes(router: &mut Router) {
 
-    // #[Route(path: "/", name: "home")]
-    router.register_route("/", |_request| {
+    // #[Route(path: "/", name: "index")]
+    router.register_route("/", |_request: &Request| {
         let mut response: Response = Response::new();
         response.set_status(StatusCode::HTTP_OK);
-        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
-        response.set_content("Hello! \nWelcome to RustWs!");
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
 
+        let mut file: File = File::open("static/index.html").unwrap();
+        let mut content: String = String::new();
+        file.read_to_string(&mut content).unwrap();
+
+        response.set_content(&content);
+        return response;
+    });
+
+    // #[Route(path: "/about", name: "about")]
+    router.register_route("/about", |_request: &Request| {
+        let mut response: Response = Response::new();
+        response.set_status(StatusCode::HTTP_OK);
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
+
+        let mut file: File = File::open("static/about.html").unwrap();
+        let mut content: String = String::new();
+        file.read_to_string(&mut content).unwrap();
+
+        response.set_content(&content);
         return response;
     });
 

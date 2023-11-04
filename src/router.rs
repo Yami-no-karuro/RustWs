@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use std::collections::HashMap;
-
 use crate::http::request::Request;
 use crate::http::response::Response;
 
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
 pub struct Router {
     routes: HashMap<String, fn(&Request) -> Response>,
 }
