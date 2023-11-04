@@ -7,6 +7,9 @@ use http::response::Response;
 use http::response_type::ContentType;
 use http::status_code::StatusCode;
 
+mod router;
+use router::Router;
+
 use std::env;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
@@ -28,12 +31,16 @@ fn main() {
             process::exit(1);
         });
 
+    println!("Registering routes...");
+    let mut router: Router = Router::new();
+    register_routes(&mut router);
+
     println!("Server ready at port {}", config.port);
     println!("Listening...");
 
     for stream in listener.incoming() {
         let stream: TcpStream = stream.unwrap();
-        if let Err(error) = run(stream) {
+        if let Err(error) = run(&router, stream) {
             eprintln!("Unable to handle connection, error: {}", error);
         }
     }
@@ -43,22 +50,39 @@ fn main() {
 
 }
 
-fn run(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+fn register_routes(router: &mut Router) {
+
+    // #[Route(path: "/", name: "home")]
+    router.register_route("/", |_request| {
+        let mut response: Response = Response::new();
+        response.set_status(StatusCode::HTTP_OK);
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
+        response.set_content("Hello! \nWelcome to RustWs!");
+
+        return response;
+    });
+
+}
+
+fn run(router: &Router, mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
 
     let request: Request = Request::from_tcp_stream(&mut stream)?;
-    println!("{:#?}", request);
+    let handler: Option<fn(&Request) -> Response<'_>> = router.get_handler(&request.path);
 
-    let mut response: Response = Response::new();
-    response.set_status(StatusCode::HTTP_OK);
-    response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
-    response.set_content("Hello! \nWelcome to RustWs!");
+    let mut response: Response;
+    if let Some(handler) = handler {
+        response = handler(&request);
+    } else {
+        response = Response::new();
+        response.set_status(StatusCode::HTTP_NOT_FOUND);
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
+    }
 
     response.set_header("X-Powered-By", "RustWS");
     response.set_header("X-Server-Version", "v1.0");
 
     let response = response.prepare();
     stream.write_all(response.as_bytes())?;
-
     return Ok(());
 
 }
