@@ -1,14 +1,14 @@
 mod config;
-use config::Config;
+use crate::config::Config;
 
-mod router;
-use router::Router;
+mod core;
+use crate::core::router::Router;
 
 mod http;
-use http::request::Request;
-use http::response::Response;
-use http::response_type::ContentType;
-use http::status_code::StatusCode;
+use crate::http::request::Request;
+use crate::http::response::Response;
+use crate::http::response_type::ContentType;
+use crate::http::status_code::StatusCode;
 
 use std::env;
 use std::fs::File;
@@ -57,28 +57,6 @@ fn register_routes(router: &mut Router) {
 
         let mut response: Response = Response::new();
         let file: Result<File, std::io::Error> = File::open("static/index.html");
-
-        if let Ok(mut file) = file {
-            let mut content: String = String::new();
-            file.read_to_string(&mut content).unwrap();
-            response.set_status(StatusCode::HTTP_OK);
-            response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
-            response.set_content(&content);
-            return response;
-        }
-
-        response.set_status(StatusCode::HTTP_INTERNAL_SERVER_ERROR);
-        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
-        response.set_content("HTTP/1.1 500 Internal Server Error");
-        return response;
-
-    });
-
-    // #[Route(path: "/about", name: "about")]
-    router.register_route("/about", |_request: &Request| {
-
-        let mut response: Response = Response::new();
-        let file: Result<File, std::io::Error> = File::open("static/about.html");
 
         if let Ok(mut file) = file {
             let mut content: String = String::new();
