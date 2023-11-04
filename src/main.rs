@@ -4,6 +4,8 @@ use config::Config;
 mod http;
 use http::request::Request;
 use http::response::Response;
+use http::response_type::ContentType;
+use http::status_code::StatusCode;
 
 use std::env;
 use std::io::prelude::*;
@@ -11,6 +13,7 @@ use std::net::{TcpListener, TcpStream};
 use std::process;
 
 fn main() {
+
     let args: Vec<String> = env::args().collect();
     let config: Config = Config::create_from_args(&args).unwrap_or_else(|err| {
         eprintln!("Unable to load configuration, error: {}", err);
@@ -30,22 +33,24 @@ fn main() {
 
     for stream in listener.incoming() {
         let stream: TcpStream = stream.unwrap();
-        if let Err(error) = handle_connection(stream) {
+        if let Err(error) = run(stream) {
             eprintln!("Unable to handle connection, error: {}", error);
         }
     }
 
     println!("Exiting..");
     process::exit(0);
+
 }
 
-fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+fn run(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+
     let request: Request = Request::from_tcp_stream(&mut stream)?;
     println!("{:#?}", request);
 
     let mut response: Response = Response::new();
-    response.set_status(Response::HTTP_OK);
-    response.set_content_type(Response::CONTENT_TYPE_TEXT_PLAIN);
+    response.set_status(StatusCode::HTTP_OK);
+    response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
     response.set_content("Hello! \nWelcome to RustWs!");
 
     response.set_header("X-Powered-By", "RustWS");
@@ -55,4 +60,5 @@ fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Er
     stream.write_all(response.as_bytes())?;
 
     return Ok(());
+
 }
