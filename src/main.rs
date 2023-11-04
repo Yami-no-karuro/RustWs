@@ -54,30 +54,46 @@ fn register_routes(router: &mut Router) {
 
     // #[Route(path: "/", name: "index")]
     router.register_route("/", |_request: &Request| {
+
         let mut response: Response = Response::new();
-        response.set_status(StatusCode::HTTP_OK);
-        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
+        let file: Result<File, std::io::Error> = File::open("static/index.html");
 
-        let mut file: File = File::open("static/index.html").unwrap();
-        let mut content: String = String::new();
-        file.read_to_string(&mut content).unwrap();
+        if let Ok(mut file) = file {
+            let mut content: String = String::new();
+            file.read_to_string(&mut content).unwrap();
+            response.set_status(StatusCode::HTTP_OK);
+            response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
+            response.set_content(&content);
+            return response;
+        }
 
-        response.set_content(&content);
+        response.set_status(StatusCode::HTTP_INTERNAL_SERVER_ERROR);
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
+        response.set_content("HTTP/1.1 500 Internal Server Error");
         return response;
+
     });
 
     // #[Route(path: "/about", name: "about")]
     router.register_route("/about", |_request: &Request| {
+
         let mut response: Response = Response::new();
-        response.set_status(StatusCode::HTTP_OK);
-        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
+        let file: Result<File, std::io::Error> = File::open("static/about.html");
 
-        let mut file: File = File::open("static/about.html").unwrap();
-        let mut content: String = String::new();
-        file.read_to_string(&mut content).unwrap();
+        if let Ok(mut file) = file {
+            let mut content: String = String::new();
+            file.read_to_string(&mut content).unwrap();
+            response.set_status(StatusCode::HTTP_OK);
+            response.set_content_type(ContentType::CONTENT_TYPE_TEXT_HTML);
+            response.set_content(&content);
+            return response;
+        }
 
-        response.set_content(&content);
+        response.set_status(StatusCode::HTTP_INTERNAL_SERVER_ERROR);
+        response.set_content_type(ContentType::CONTENT_TYPE_TEXT_PLAIN);
+        response.set_content("HTTP/1.1 500 Internal Server Error");
         return response;
+
     });
 
 }
@@ -99,7 +115,7 @@ fn run(router: &Router, mut stream: TcpStream) -> Result<(), Box<dyn std::error:
     response.set_header("X-Powered-By", "RustWS");
     response.set_header("X-Server-Version", "v1.0");
 
-    let response = response.prepare();
+    let response: String = response.prepare();
     stream.write_all(response.as_bytes())?;
     return Ok(());
 
