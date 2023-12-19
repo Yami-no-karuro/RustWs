@@ -52,7 +52,6 @@ fn main() {
 
 fn register_routes(router: &mut Router) {
 
-    // #[Route(path: "/", name: "index")]
     router.register_route("/", |_request: &Request| {
 
         let mut response: Response = Response::new();
